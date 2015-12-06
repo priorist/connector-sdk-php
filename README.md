@@ -22,34 +22,36 @@ dependencies, add the following to your _composer.json_:
 
 This is an example how to fetch and print all elements of a stream.
 
-    use Priorist\Connector\Connector;
-    use Priorist\Connector\Stream;
+```php
+use Priorist\Connector\Connector;
+use Priorist\Connector\Stream;
 
-    try {
-        $stream = Connector::fetchStream('your-stream-id');
-        printStream($stream);
-    } catch (Exception $e) {
-        echo 'Error: ' . $e->getMessage() . "\n";
+try {
+    $stream = Connector::fetchStream('your-stream-id');
+    printStream($stream);
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage() . "\n";
+}
+
+function printStream(Stream $stream)
+{
+    if (!$stream->hasElements()) {
+        exit("Stream is empty.\n");
     }
 
-    function printStream(Stream $stream)
-    {
-        if (!$stream->hasElements()) {
-            exit("Stream is empty.\n");
-        }
+    printf(
+        "Stream `%s` has %u elements.\n\n",
+        $stream->title,
+        $stream->count()
+    );
 
+    foreach ($stream as $element) {
         printf(
-            "Stream `%s` has %u elements.\n\n",
-            $stream->title,
-            $stream->count()
+            "%s on %s:\n%s\n\n",
+            $element->author->display_name,
+            $element->created->format('F jS'),
+            $element->text
         );
-
-        foreach ($stream as $element) {
-            printf(
-                "%s on %s:\n%s\n\n",
-                $element->author->display_name,
-                $element->created->format('F jS'),
-                $element->text
-            );
-        }
     }
+}
+```
