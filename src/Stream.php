@@ -45,6 +45,22 @@ class Stream implements StreamInterface
     }
 
 
+    /**
+     * Checks if the stream contains any elements.
+     *
+     * @return boolean True if strem has at least one element
+     */
+    public function hasElements()
+    {
+        return $this->count() > 0;
+    }
+
+
+    /**
+     * Populates the stream with values from an array.
+     *
+     * @param array $data The array containing the stream data
+     */
     public function fromArray(array $data)
     {
         $this->data = $data;
@@ -62,6 +78,14 @@ class Stream implements StreamInterface
     }
 
 
+    /**
+     * Transforms stream properries, if need be
+     *
+     * @param string $name Name of the property
+     * @param mixed $value Value of the property
+     *
+     * @return mixed Transformed value of property
+     */
     protected function parseProperty($name, $value)
     {
         switch ($name) {
@@ -74,17 +98,6 @@ class Stream implements StreamInterface
             default:
                 return $value;
         }
-    }
-
-
-    /**
-     * Checks if the stream contains any elements.
-     *
-     * @return boolean True if strem has at least one element
-     */
-    public function hasElements()
-    {
-        return $this->count() != 0;
     }
 
 
