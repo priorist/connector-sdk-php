@@ -27,6 +27,7 @@ This is an example how to fetch and print all elements of a stream.
 
 ```php
 use Priorist\Connector\Connector;
+use Priorist\Connector\StreamInterface;
 
 try {
     $stream = Connector::fetchStream('your-stream-id');
@@ -35,7 +36,7 @@ try {
     echo 'Error: ' . $e->getMessage() . "\n";
 }
 
-function printStream(Stream $stream)
+function printStream(StreamInterface $stream)
 {
     if (!$stream->hasElements()) {
         exit("Stream is empty.\n");
