@@ -6,11 +6,11 @@ namespace Priorist\Connector;
  * Represents a stream and provides access to its properties and
  * elements.
  *
- * Requires PHP >= 5.1.0 and PECL json >= 1.2.0.
+ * Requires PHP >= 5.2.0 and PECL json >= 1.2.0
  */
-class Stream implements \Iterator, \Serializable, \Countable
+class Stream implements StreamInterface
 {
-    protected $properties;
+    protected $data;
     protected $elements;
 
 
@@ -19,6 +19,9 @@ class Stream implements \Iterator, \Serializable, \Countable
      */
     public function __construct($json)
     {
+        // Prevent default timezone warning if not set by user
+        date_default_timezone_set(@date_default_timezone_get());
+
         $this->unserialize($json);
     }
 
@@ -34,19 +37,42 @@ class Stream implements \Iterator, \Serializable, \Countable
      */
     public function __get($property)
     {
-        if (!property_exists($this->properties, $property)) {
+        if (!isset($this->data[$property])) {
             throw new \InvalidArgumentException('Property `' . $property . '` does not exist.');
         }
 
-        switch ($property) {
+        return $this->data[$property];
+    }
+
+
+    public function fromArray(array $data)
+    {
+        $this->data = $data;
+
+        foreach ($this->data as $name => &$value) {
+            $value = $this->parseProperty($name, $value);
+        }
+
+        // Parse single elements
+        foreach ($this->data['elements'] as &$element) {
+            // TODO: Create and set Element object
+        }
+
+        $this->elements = &$this->data['elements'];
+    }
+
+
+    protected function parseProperty($name, $value)
+    {
+        switch ($name) {
             case 'elements':
-                return new \ArrayObject($this->elements);
+                return new \ArrayObject($value);
 
             case 'created':
-                return new \DateTime($this->properties->$property);
+                return new \DateTime($value);
 
             default:
-                return $this->properties->$property;
+                return $value;
         }
     }
 
@@ -120,7 +146,7 @@ class Stream implements \Iterator, \Serializable, \Countable
      */
     public function serialize()
     {
-        return $this->json;
+        return json_encode($this->data);
     }
 
 
@@ -130,30 +156,25 @@ class Stream implements \Iterator, \Serializable, \Countable
      * @param string $json JSON string to populate stream
      *
      * @throws UnexpectedValueException if JSON unserializes to unexpected value.
-     * @throws InvalidArgumentException if stream data is invalid.
+     * @throws InvalidArgumentException if JSON is not valid
      */
     public function unserialize($json)
     {
-        $this->properties = json_decode($json);
-        $this->json = $json;
+        $data = json_decode($json, true, 4, JSON_BIGINT_AS_STRING);
 
-        if (!is_object($this->properties)) {
-            throw new \UnexpectedValueException('Object expected from JSON source.');
+        if ($data === null) {
+            throw new \InvalidArgumentException('Invalid JSON.');
         }
 
-        if (!property_exists($this->properties, 'elements')) {
-            throw new \InvalidArgumentException('Invalid stream data.');
+        if (!is_array($data)) {
+            throw new \UnexpectedValueException('Array expected from JSON source.');
         }
 
-        // Prevent default timezone warning if not set by user
-        date_default_timezone_set(@date_default_timezone_get());
-
-        $this->elements = &$this->properties->elements;
-
-        // Parse single elements
-        foreach ($this->elements as $element) {
-            $element->created = new \DateTime($element->created);
+        if (!isset($data['elements'])) {
+            throw new \UnexpectedValueException('Invalid stream data.');
         }
+
+        $this->fromArray($data);
     }
 
 
