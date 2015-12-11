@@ -15,4 +15,7 @@
             <directory suffix=".php">./tests/</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <var name="validStreamId" value="priorist" />
+    </php>
 </phpunit>
