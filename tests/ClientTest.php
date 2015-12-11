@@ -39,7 +39,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testForValidStream()
     {
-        $stream = Client::fetchStream($GLOBALS['validStreamId']);
+        $stream = Client::fetchStream($_SERVER['validStreamId']);
 
         $this->assertInstanceOf(StreamInterface::class, $stream);
     }

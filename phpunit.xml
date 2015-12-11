@@ -16,6 +16,6 @@
         </testsuite>
     </testsuites>
     <php>
-        <var name="validStreamId" value="priorist" />
+        <server name="validStreamId" value="priorist" />
     </php>
 </phpunit>
