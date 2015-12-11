@@ -26,11 +26,11 @@ dependencies, add the following to your _composer.json_:
 This is an example how to fetch and print all elements of a stream.
 
 ```php
-use Priorist\Connector\Connector;
+use Priorist\Connector\Client;
 use Priorist\Connector\StreamInterface;
 
 try {
-    $stream = Connector::fetchStream('your-stream-id');
+    $stream = Client::fetchStream('your-stream-id');
     printStream($stream);
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage() . "\n";
@@ -67,4 +67,4 @@ run
 
     $ curl -sS https://getcomposer.org/installer | php
     $ php composer.phar install
-    $ php composer.phar run-script test
+    $ php composer.phar test
